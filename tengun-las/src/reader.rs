@@ -1,11 +1,11 @@
 use std::path::Path;
 
-use las::{Read, Reader};
+use las::{Read, Reader, Point};
 
 type Geokey = u16;
 
 pub struct LasReader {
-    pub reader: Reader,
+    reader: Reader,
 }
 
 impl LasReader {
@@ -19,6 +19,10 @@ impl LasReader {
             let p = p.unwrap();
             println!("Coord: {}, {}, {}, {:?}", p.x, p.y, p.z, p.color);
         }
+    }
+
+    pub fn get_coords(&mut self) -> Result<Vec<Point>, las::Error> {
+        self.reader.points().collect()
     }
 
     pub fn print_raw_vlrs(&self) {
