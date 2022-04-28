@@ -125,13 +125,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tengun2"
-version = "0.1.0"
-dependencies = [
- "tengun-las",
-]
-
-[[package]]
 name = "thiserror"
 version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"

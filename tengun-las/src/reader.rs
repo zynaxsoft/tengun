@@ -2,6 +2,8 @@ use std::path::Path;
 
 use las::{Read, Reader};
 
+type Geokey = u16;
+
 pub struct LasReader {
     pub reader: Reader,
 }
@@ -28,5 +30,25 @@ impl LasReader {
                 print!("{} ", number);
             }
         }
+    }
+
+    pub fn get_geokey(&self) -> Option<Geokey> {
+        let mut geo_data = None;
+        for r in self.reader.header().all_vlrs() {
+            if r.record_id == 34735 {
+                geo_data = Some(&r.data);
+                break;
+            }
+        }
+        if let Some(data) = geo_data {
+            let mut converted = Vec::new();
+            for n in data.chunks(2) {
+                let array = n.try_into().unwrap();
+                let number = u16::from_le_bytes(array);
+                converted.push(number)
+            }
+            return Some(converted.iter().skip_while(|&&n| n != 3072).nth(3).unwrap().clone())
+        }
+        None
     }
 }
