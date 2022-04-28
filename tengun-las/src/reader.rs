@@ -46,11 +46,11 @@ impl LasReader {
             .data
             .iter()
             .cloned()
-            .skip_while(|&n| n != 12)  // 0x00C0 for 3072 in LE
+            .skip_while(|&n| n != 0x0C)  // search for 3072 which is 0x000C in LE
             .skip(5)
             .take(2)
             .collect();
-        if record.is_empty() {
+        if geokey.is_empty() {
             return None
         }
         Some(u16::from_le_bytes(geokey[..2].try_into().unwrap()))
