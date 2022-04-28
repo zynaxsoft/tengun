@@ -33,22 +33,22 @@ impl LasReader {
     }
 
     pub fn get_geokey(&self) -> Option<Geokey> {
-        let mut geo_data = None;
-        for r in self.reader.header().all_vlrs() {
-            if r.record_id == 34735 {
-                geo_data = Some(&r.data);
-                break;
-            }
+        let record = self
+            .reader
+            .header()
+            .all_vlrs()
+            .find(|r| r.record_id == 34735)?;
+        let geokey: Vec<u8> = record
+            .data
+            .iter()
+            .cloned()
+            .skip_while(|&n| n != 12)  // 0x00C0 for 3072 in LE
+            .skip(5)
+            .take(2)
+            .collect();
+        if record.is_empty() {
+            return None
         }
-        if let Some(data) = geo_data {
-            let mut converted = Vec::new();
-            for n in data.chunks(2) {
-                let array = n.try_into().unwrap();
-                let number = u16::from_le_bytes(array);
-                converted.push(number)
-            }
-            return Some(converted.iter().skip_while(|&&n| n != 3072).nth(3).unwrap().clone())
-        }
-        None
+        Some(u16::from_le_bytes(geokey[..2].try_into().unwrap()))
     }
 }
